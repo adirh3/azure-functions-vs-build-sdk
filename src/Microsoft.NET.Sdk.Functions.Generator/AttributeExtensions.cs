@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.NET.Sdk.Functions.MakeFunction;
 using Mono.Cecil;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace MakeFunctionJson
@@ -17,12 +18,18 @@ namespace MakeFunctionJson
         /// <returns></returns>
         public static string ToAttributeFriendlyName(this Attribute attribute)
         {
-            return ToAttributeFriendlyName(attribute.GetType().Name);
+            return ToAttributeFriendlyName(attribute.GetType());
         }
 
         public static string ToAttributeFriendlyName(this CustomAttribute attribute)
         {
-            return ToAttributeFriendlyName(attribute.AttributeType.Name);
+            return ToAttributeFriendlyName(attribute.AttributeType.ToReflectionType());
+        }
+
+        private static string ToAttributeFriendlyName(Type attributeType)
+        {
+            string name = attributeType.GetCustomAttribute<JsonObjectAttribute>()?.Id ?? attributeType.Name;
+            return ToAttributeFriendlyName(name);
         }
 
         private static string ToAttributeFriendlyName(string name)
